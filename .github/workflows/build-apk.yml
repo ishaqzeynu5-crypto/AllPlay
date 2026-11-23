@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Unzip AllPlay.zip & Apply Build Fixes
+      - name: Unzip AllPlay.zip, Apply Fixes & Set App Icon
         run: |
           unzip -o AllPlay.zip -d workdir
           PROJECT_DIR=$(dirname "$(find workdir -name 'settings.gradle.kts' | head -n 1)")
@@ -24,6 +24,13 @@ jobs:
           sed -i 's/"2\.8\.5"/"2.8.4"/g' "$PROJECT_DIR/app/build.gradle.kts"
           sed -i 's/"3\.6\.3"/"3.1.0"/g' "$PROJECT_DIR/app/build.gradle.kts"
           sed -i "s/couldn't/couldn’t/g" "$PROJECT_DIR/app/src/main/res/values/strings.xml"
+
+          if ls icon.* 1> /dev/null 2>&1; then
+            mkdir -p "$PROJECT_DIR/app/src/main/res/mipmap-xxxhdpi"
+            convert icon.* -resize 512x512^ -gravity center -extent 512x512 "$PROJECT_DIR/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png"
+            sed -i 's|android:label="@string/app_name"|android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:label="@string/app_name"|' "$PROJECT_DIR/app/src/main/AndroidManifest.xml"
+          fi
+
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
       - name: Set up JDK 17
