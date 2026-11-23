@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Unzip AllPlay.zip & Align AGP 8 / SDK 35 Dependencies
+      - name: Unzip AllPlay.zip & Apply Build Fixes
         run: |
           unzip -o AllPlay.zip -d workdir
           PROJECT_DIR=$(dirname "$(find workdir -name 'settings.gradle.kts' | head -n 1)")
@@ -23,6 +23,7 @@ jobs:
           sed -i 's/"1\.11\.1"/"1.8.0"/g' "$PROJECT_DIR/app/build.gradle.kts"
           sed -i 's/"2\.8\.5"/"2.8.4"/g' "$PROJECT_DIR/app/build.gradle.kts"
           sed -i 's/"3\.6\.3"/"3.1.0"/g' "$PROJECT_DIR/app/build.gradle.kts"
+          sed -i "s/couldn't/couldn’t/g" "$PROJECT_DIR/app/src/main/res/values/strings.xml"
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
       - name: Set up JDK 17
